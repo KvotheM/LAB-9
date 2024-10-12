@@ -1,31 +1,39 @@
+//Nicolás Moklebust
+//Este código recibe la instrucción del núcleo y dependiendo de esta devuelve el voltaje necesario
+
+//Llamamos las librerías que necesitamos para el funcionamiento
 #include <Arduino.h>
 #include <driver/adc.h>
-
+//indicamos los pines de los dos potenciómetros
 #define pot1 33
 #define pot2 32
 
+//definimos las variables a utilizar, para la medida analógica, mapeo de voltaje y para guardar la instrucción recibida
 float volt1, volt2;
-int voltaje1, voltaje2, weno;
+int voltaje1, voltaje2;
 char opcion;
 
 void setup() {
+Se inicia el monitor serial
   Serial.begin(115200);
-  Serial.println("Si si");
 }
 
 void loop() {
+//hacemos la lectura de los potenciómetros y mapeamos los valores de 0-15
   volt1 = analogRead(pot1);
   volt2 = analogRead(pot2);
   voltaje1 = map(volt1, 0, 4095, 0, 15);
   voltaje2 = map(volt2, 0, 4095, 0, 15);
+
+//indicamos que haga la lectura de la instrucción si el monitor serial está disponible y colocamos un delay para mejor funcionamiento
   if(Serial.available() > 0){
     opcion = Serial.read();
     delay(10); 
   }
-  
+//si se recibe '1' se manda el voltaje del primer potenciómetro y si recibe dos se manda el del segundo para que el núcleo lo proceso y despliegue en el display de 7
+//segmentos
   if(opcion == '1'){
     Serial.write(voltaje1);
-    Serial.println(voltaje1);
     opcion == '0';
   }
   if(opcion == '2'){
