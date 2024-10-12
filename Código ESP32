@@ -1,0 +1,37 @@
+#include <Arduino.h>
+#include <driver/adc.h>
+
+#define pot1 33
+#define pot2 32
+
+float volt1, volt2;
+int voltaje1, voltaje2, weno;
+char opcion;
+
+void setup() {
+  Serial.begin(115200);
+  Serial.println("Si si");
+}
+
+void loop() {
+  volt1 = analogRead(pot1);
+  volt2 = analogRead(pot2);
+  voltaje1 = map(volt1, 0, 4095, 0, 15);
+  voltaje2 = map(volt2, 0, 4095, 0, 15);
+  if(Serial.available() > 0){
+    opcion = Serial.read();
+    delay(10); 
+  }
+  
+  if(opcion == '1'){
+    Serial.write(voltaje1);
+    Serial.println(voltaje1);
+    opcion == '0';
+  }
+  if(opcion == '2'){
+    Serial.write(voltaje2);
+    Serial.println(voltaje2);
+    opcion == '0';
+  }
+
+}
