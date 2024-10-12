@@ -1,3 +1,6 @@
+/*Nicolás Moklebust, 22037
+Este programa espera a que se precione un botón, dependiendo de cual se presiona se le envía una orden al esp32 y se espera el voltaje mapeado que este toma de uno de los potenciómetros
+*/
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
@@ -43,10 +46,14 @@
 UART_HandleTypeDef huart1;
 
 /* USER CODE BEGIN PV */
+
+//Se definen los buffers para recibir las variables que el ESP32 envíe
 uint8_t digito1 = 0;
 uint8_t digito2 = 0;
+//Se definen las variables "bandera" que activaran los protocolos de envío y recibimiento
 int boton1 = 0;
 int boton2 = 0;
+//Se define el buffer que se enviará al ESP32 como instrucción para medición de voltaje
 char indicador = '0';
 /* USER CODE END PV */
 
@@ -55,6 +62,7 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_USART1_UART_Init(void);
 /* USER CODE BEGIN PFP */
+//colocamos el prototipo de la función que coloca el voltaje medido en el display de 7 segmentos
 void display(uint8_t digito);
 /* USER CODE END PFP */
 
@@ -103,6 +111,8 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+//Dependiendo del botón precionado se activa uno de los dos ciclos, los cuales envían la instrucción al ESP32 y reciben la información que este mande. Además, activa la función para desplegar el voltaje
+//en el display de 7 segmentos
 	 if(boton1 == 1){
 		 indicador = '1';
 		 HAL_UART_Transmit(&huart1, (uint8_t*)&indicador, sizeof(indicador), 10);
@@ -301,6 +311,8 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+
+//esta función recibe el voltaje del esp32 y lo despliega en un display de 7 segmentos prendiendo los diferentes componentes que se necesitan colocar el valor de 0-15 en hexadecimal (0-F)
 void display(uint8_t digito){
 	if(digito == 0){
 	  HAL_GPIO_WritePin(GPIOB,A_Pin, GPIO_PIN_SET);
@@ -447,6 +459,8 @@ void display(uint8_t digito){
 	  HAL_GPIO_WritePin(GPIOB,G_Pin, GPIO_PIN_SET);
 	}
 }
+//la función de interrupción se activa al presionar uno de los dos botones, esta es activada por un flanco positivo. Dependiendo del botón elegido se activa la variable boton1 o boton2 que sirven para
+//activar los ciclos en el main.
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 	if(GPIO_Pin == BOT1_Pin){
 		boton1 = 1;
